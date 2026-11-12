@@ -13,13 +13,34 @@ from scripts.discover import discover
 from scripts.fetch import fetch_plugins
 from scripts.merge import OUTPUT_PATH, merge, needs_write, read_json, write_json
 
+log = logging.getLogger(__name__)
 
-def build(config_path: Path) -> list[dict]:
-    """Discover, fetch and merge all plugin entries."""
+
+def from_repo(entries: list[dict], owner: str, repo: str) -> list[dict]:
+    """Entries whose RepoUrl or DownloadLinkInstall points into github.com/<owner>/<repo>."""
+    prefix = f"https://github.com/{owner}/{repo}/".lower()
+
+    def matches(entry: dict) -> bool:
+        links = (entry.get("RepoUrl", ""), entry.get("DownloadLinkInstall", ""))
+        return any((str(link).rstrip("/") + "/").lower().startswith(prefix) for link in links)
+
+    return [entry for entry in entries if matches(entry)]
+
+
+def build(config_path: Path, previous: list[dict]) -> list[dict]:
+    """Discover, fetch and merge all plugin entries.
+
+    If a repo's fetch fails, its entries from `previous` are kept. Repos that are no longer
+    discovered are dropped.
+    """
     config = load_config(config_path)
     entries = []
     for repo in discover(config):
-        entries += fetch_plugins(repo, config) or []
+        plugins = fetch_plugins(repo, config)
+        if plugins is None:
+            plugins = from_repo(previous, config.owner, repo)
+            log.warning("%s: fetch failed, keeping %d previous entries", repo, len(plugins))
+        entries += plugins
     return merge(entries)
 
 
@@ -46,12 +67,13 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    new = build(args.config)
+    old = read_json(args.output)
+    new = build(args.config, old)
     if not needs_write(new, args.output):
         print("No changes.")
         return 0
 
-    print("\n".join(summarize(read_json(args.output), new)) or "Plugin details changed.")
+    print("\n".join(summarize(old, new)) or "Plugin details changed.")
     if args.dry_run:
         print(f"Dry run: {args.output} not written.")
     else:
