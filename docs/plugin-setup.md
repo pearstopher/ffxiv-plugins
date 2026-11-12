@@ -19,11 +19,14 @@ is a fine-grained personal access token, which you create once and reuse in ever
 6. Click **Generate token** and copy it. You only need it for the `gh secret set` step below, so
    there is no need to save it anywhere else.
 
-### Repos using the token
+### Renewing the token
 
-When the token is renewed, run step 3 of the checklist again for each of these:
+Every plugin repo with the `dalamud-plugin` topic uses the token. After creating a new one, run
+step 3 of the checklist again for each repo this lists:
 
-- _None yet._
+```
+gh search repos --owner pearstopher --topic dalamud-plugin
+```
 
 ## Per-plugin checklist
 
@@ -38,14 +41,11 @@ Replace `<repo>` with the plugin repo's name.
    `AssemblyVersion`, `DalamudApiLevel` and `DownloadLinkInstall`. Its `RepoUrl` or
    `DownloadLinkInstall` must start with `https://github.com/pearstopher/<repo>/`, so that if a
    fetch fails, the previous entry can be kept.
-   [FFXIV-Remove-Duplicate-PF](https://github.com/pearstopher/FFXIV-Remove-Duplicate-PF) is a
-   working example (`.github/workflows/release.yml` and `.github/scripts/make_repo_json.py`).
 3. **Secret.** Save the token in the plugin repo. The command asks for the value; paste the
    token there:
    ```
    gh secret set PLUGIN_REPO_TOKEN --repo pearstopher/<repo>
    ```
-   Then add the repo to [Repos using the token](#repos-using-the-token).
 4. **Notify step.** Add this to the release workflow **after** the step that pushes `repo.json`,
    so the update reads the new file:
    ```yaml
@@ -64,7 +64,7 @@ Replace `<repo>` with the plugin repo's name.
 
 | Symptom | Likely cause |
 | --- | --- |
-| Notify step fails with 401 or 403 | Token expired, or it lacks access to `ffxiv-plugins` or Contents write. Create a new token and repeat step 3 for every repo in the list. |
+| Notify step fails with 401 or 403 | Token expired, or it lacks access to `ffxiv-plugins` or Contents write. Create a new token, then follow [Renewing the token](#renewing-the-token). |
 | Notify step fails with 404 | Wrong repo name in the step, or the token can't see `ffxiv-plugins`. |
 | Notify succeeds, but no update run appears | `event_type` isn't exactly `plugin-updated`. |
 | Update runs, but the plugin is missing | Topic missing, `repo.json` missing on the default branch, or a required field missing. The run log shows a warning naming the problem. |
