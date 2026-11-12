@@ -19,9 +19,12 @@ previous entry is kept, so a temporary GitHub problem never removes a plugin fro
 
 ## Adding a new plugin
 
+Follow [plugin-setup.md](plugin-setup.md). In short:
+
 1. Give the plugin repo the `dalamud-plugin` topic.
 2. Make sure its release workflow commits a `repo.json` to the default branch.
-3. Add the release trigger so this list updates on every release.
+3. Save the token as its `PLUGIN_REPO_TOKEN` secret and add the notify step to its release
+   workflow, so this list updates on every release.
 
 ## Development
 
