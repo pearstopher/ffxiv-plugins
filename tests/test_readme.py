@@ -2,7 +2,8 @@ import json
 
 import pytest
 
-from scripts.readme import END, START, cell, main, plugin_table, render
+from scripts.config import load_config
+from scripts.readme import END, README_PATH, START, cell, main, plugin_table, render
 
 PLUGIN = {
     "Name": "Remove Duplicate PF",
@@ -48,6 +49,14 @@ def test_render_is_deterministic():
 def test_render_requires_markers():
     with pytest.raises(ValueError, match="markers"):
         render("# No markers\n", [PLUGIN])
+
+
+def test_repo_readme_has_markers_and_correct_link():
+    readme = README_PATH.read_text(encoding="utf-8")
+    owner = load_config().owner
+    render(readme, [])  # raises if the markers are missing
+    link = f"https://raw.githubusercontent.com/{owner}/ffxiv-plugins/main/pluginmaster.json"
+    assert link in readme
 
 
 def test_main_updates_then_reports_unchanged(tmp_path, capsys):
