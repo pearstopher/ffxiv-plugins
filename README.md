@@ -15,5 +15,5 @@ Paste it in game under `/xlsettings` → **Experimental** → **Custom Plugin Re
 <!-- plugins:start -->
 | Plugin | Description | Version |
 | --- | --- | --- |
-| [Remove Duplicate PF](https://github.com/pearstopher/FFXIV-Remove-Duplicate-PF) | Collapses duplicate Party Finder listings into one. | 1.1.3.0 |
+| [Remove Duplicate PF](https://github.com/pearstopher/FFXIV-Remove-Duplicate-PF) | Collapses duplicate Party Finder listings into one. | 1.1.4.0 |
 <!-- plugins:end -->
