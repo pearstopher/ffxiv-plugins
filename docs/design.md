@@ -47,7 +47,8 @@ All other fields are copied through unchanged.
   not archived. Repos are listed through the GitHub API.
 - `config.json` has `include` and `exclude` lists to add or drop repos by name, whatever their
   topics.
-- **Action needed:** add the `dalamud-plugin` topic to `FFXIV-Remove-Duplicate-PF`.
+- `FFXIV-Remove-Duplicate-PF` has the topic and is fully connected (#27, #28). New plugins
+  follow [plugin-setup.md](plugin-setup.md).
 
 ### Fetching
 - For each repo, try the candidate filenames from `config.json` (default `["repo.json"]`) on its
