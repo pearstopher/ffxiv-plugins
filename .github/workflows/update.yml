@@ -1,0 +1,43 @@
+name: Update plugin list
+
+# Rebuilds pluginmaster.json and commits it if it changed. Runs when a plugin repo's
+# release workflow sends a "plugin-updated" event (see docs/plugin-setup.md), or manually.
+on:
+  repository_dispatch:
+    types: [plugin-updated]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# One run at a time; a run triggered while another is going waits for it.
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Build pluginmaster.json
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -m scripts.build_repo
+
+      - name: Commit if changed
+        run: |
+          git add pluginmaster.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update pluginmaster.json"
+          git push

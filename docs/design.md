@@ -65,13 +65,16 @@ All other fields are copied through unchanged.
   endings and a trailing newline. Rebuilding unchanged input produces no diff.
 
 ### Updates
-- **Scheduled run** (#9): an hourly cron. The first step reads `auto_update.enabled` and
-  `auto_update.interval_hours` from `config.json` and exits early unless the run is enabled and
-  the hour lines up with the interval. Ships with `enabled: false` and `interval_hours: 1`.
-- **Manual run:** `workflow_dispatch` always builds.
-- **Instant run** (#10): a plugin's release workflow can send a `repository_dispatch` event
-  (`plugin-updated`) to this repo after it commits `repo.json`. It needs a fine-grained PAT with
-  Contents read/write on `ffxiv-plugins`, stored as a secret in the plugin repo. This trigger
-  also follows `auto_update.enabled`.
-- The workflow commits only when `pluginmaster.json` or the README plugin list changed, using
-  `GITHUB_TOKEN` with `contents: write`.
+`.github/workflows/update.yml` rebuilds `pluginmaster.json`. There is no schedule (#9 was
+dropped); it runs on two triggers:
+
+- **Release-triggered:** after a plugin's release workflow commits its new `repo.json`, it sends
+  a `repository_dispatch` event (`plugin-updated`) to this repo. This needs one fine-grained PAT
+  with Contents read/write on `ffxiv-plugins`, saved as the `PLUGIN_REPO_TOKEN` secret in each
+  plugin repo. See `docs/plugin-setup.md` (#16).
+- **Manual:** `workflow_dispatch` from the Actions tab, e.g. after adding a new plugin or to
+  recover from an error.
+
+The workflow commits only when the output changed, using `GITHUB_TOKEN` with
+`contents: write`. A `concurrency` group runs one update at a time, so close-together releases
+don't race to push.
