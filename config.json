@@ -1,0 +1,7 @@
+{
+  "owner": "pearstopher",
+  "topic": "dalamud-plugin",
+  "include": [],
+  "exclude": [],
+  "filenames": ["repo.json"]
+}
