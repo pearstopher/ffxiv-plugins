@@ -3,14 +3,20 @@
 import json
 import os
 import re
+import time
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 API_URL = "https://api.github.com"
+ATTEMPTS = 3  # retries cover network errors, 5xx and 429 (rate limited)
 _NEXT_LINK = re.compile(r'<([^>]+)>;\s*rel="next"')
 
 
 def request(url: str, accept: str = "application/vnd.github+json") -> tuple[bytes, str]:
-    """GET a URL. Returns the body and the Link header. Uses GITHUB_TOKEN if set."""
+    """GET a URL. Returns the body and the Link header. Uses GITHUB_TOKEN if set.
+
+    Transient failures are retried with backoff; other HTTP errors (e.g. 404) raise at once.
+    """
     headers = {
         "Accept": accept,
         "User-Agent": "ffxiv-plugins",
@@ -18,8 +24,19 @@ def request(url: str, accept: str = "application/vnd.github+json") -> tuple[byte
     }
     if token := os.environ.get("GITHUB_TOKEN"):
         headers["Authorization"] = f"Bearer {token}"
-    with urlopen(Request(url, headers=headers), timeout=30) as response:
-        return response.read(), response.headers.get("Link", "")
+    for attempt in range(1, ATTEMPTS + 1):
+        try:
+            with urlopen(Request(url, headers=headers), timeout=30) as response:
+                return response.read(), response.headers.get("Link", "")
+        except OSError as error:  # HTTPError, network errors and timeouts
+            if attempt == ATTEMPTS or not is_transient(error):
+                raise
+            time.sleep(2**attempt)  # 2s, then 4s
+
+
+def is_transient(error: OSError) -> bool:
+    """Network errors, server errors and rate limits are worth retrying."""
+    return not isinstance(error, HTTPError) or error.code == 429 or error.code >= 500
 
 
 def get_all(path: str) -> list:

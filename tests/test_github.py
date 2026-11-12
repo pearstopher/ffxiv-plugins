@@ -1,4 +1,7 @@
 import json
+from urllib.error import HTTPError, URLError
+
+import pytest
 
 from scripts import github
 
@@ -48,6 +51,55 @@ def test_token_is_sent_when_set(monkeypatch):
 
     github.get_all("/x")
     assert requests[0].get_header("Authorization") == "Bearer secret"
+
+
+def flaky_urlopen(outcomes, calls):
+    """Each call pops the next outcome: raise it if it's an exception, else return it."""
+
+    def urlopen(request, timeout):
+        calls.append(request.full_url)
+        outcome = outcomes.pop(0)
+        if isinstance(outcome, Exception):
+            raise outcome
+        return outcome
+
+    return urlopen
+
+
+@pytest.mark.parametrize(
+    "error",
+    [HTTPError("u", 502, "Bad Gateway", {}, None), HTTPError("u", 429, "Too Many", {}, None),
+     URLError("reset"), TimeoutError("slow")],
+)
+def test_transient_errors_are_retried(monkeypatch, error):
+    calls, sleeps = [], []
+    monkeypatch.setattr(github, "urlopen", flaky_urlopen([error, FakeResponse([1])], calls))
+    monkeypatch.setattr(github.time, "sleep", sleeps.append)
+
+    assert github.request("https://x")[0] == b"[1]"
+    assert len(calls) == 2
+    assert sleeps == [2]
+
+
+def test_gives_up_after_all_attempts(monkeypatch):
+    calls = []
+    outcomes = [URLError("down")] * github.ATTEMPTS
+    monkeypatch.setattr(github, "urlopen", flaky_urlopen(outcomes, calls))
+    monkeypatch.setattr(github.time, "sleep", lambda seconds: None)
+
+    with pytest.raises(URLError):
+        github.request("https://x")
+    assert len(calls) == github.ATTEMPTS
+
+
+def test_404_is_not_retried(monkeypatch):
+    calls = []
+    not_found = HTTPError("u", 404, "Not Found", {}, None)
+    monkeypatch.setattr(github, "urlopen", flaky_urlopen([not_found], calls))
+
+    with pytest.raises(HTTPError):
+        github.request("https://x")
+    assert len(calls) == 1
 
 
 def test_no_auth_header_without_token(monkeypatch):
