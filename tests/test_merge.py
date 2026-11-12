@@ -1,6 +1,6 @@
 import json
 
-from scripts.merge import merge, to_json, version_key, write_json
+from scripts.merge import merge, needs_write, read_json, to_json, version_key, write_json
 
 
 def entry(name, version, **extra):
@@ -42,20 +42,28 @@ def test_json_format():
     assert json.loads(data) == [entry("Á", "1")]
 
 
-def test_write_json_uses_lf_and_reports_changes(tmp_path):
+def test_write_and_read_round_trip_with_lf(tmp_path):
     path = tmp_path / "pluginmaster.json"
     entries = [entry("A", "1", Description="line one\nline two")]
 
-    assert write_json(entries, path) is True
+    assert read_json(path) == []
+    write_json(entries, path)
     assert b"\r" not in path.read_bytes()
-    assert write_json(entries, path) is False  # unchanged
-    assert write_json([entry("A", "2")], path) is True
+    assert read_json(path) == entries
 
 
-def test_write_json_rewrites_crlf_file(tmp_path):
+def test_needs_write_detects_changes(tmp_path):
+    path = tmp_path / "pluginmaster.json"
+    entries = [entry("A", "1")]
+
+    assert needs_write(entries, path)  # missing file
+    write_json(entries, path)
+    assert not needs_write(entries, path)
+    assert needs_write([entry("A", "2")], path)
+
+
+def test_needs_write_flags_crlf_copy(tmp_path):
     path = tmp_path / "pluginmaster.json"
     entries = [entry("A", "1")]
     path.write_bytes(to_json(entries).replace(b"\n", b"\r\n"))
-
-    assert write_json(entries, path) is True
-    assert path.read_bytes() == to_json(entries)
+    assert needs_write(entries, path)
