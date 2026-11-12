@@ -1,6 +1,6 @@
 name: Update plugin list
 
-# Rebuilds pluginmaster.json and commits it if it changed. Runs when a plugin repo's
+# Rebuilds pluginmaster.json and the README plugin table, and commits them if they changed. Runs when a plugin repo's
 # release workflow sends a "plugin-updated" event (see docs/plugin-setup.md), or manually.
 on:
   repository_dispatch:
@@ -30,14 +30,17 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python -m scripts.build_repo
 
+      - name: Update README plugin list
+        run: python -m scripts.readme
+
       - name: Commit if changed
         run: |
-          git add pluginmaster.json
+          git add pluginmaster.json README.md
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Update pluginmaster.json"
+          git commit -m "Update plugin list"
           git push
