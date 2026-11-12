@@ -27,10 +27,15 @@ def to_json(entries: list[dict]) -> bytes:
     return (json.dumps(entries, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
 
 
-def write_json(entries: list[dict], path: Path = OUTPUT_PATH) -> bool:
-    """Write entries to path. Returns True if the file content changed."""
-    data = to_json(entries)
-    if path.exists() and path.read_bytes() == data:
-        return False
-    path.write_bytes(data)
-    return True
+def read_json(path: Path = OUTPUT_PATH) -> list[dict]:
+    """Entries from an existing output file, or [] if there is none yet."""
+    return json.loads(path.read_bytes()) if path.exists() else []
+
+
+def needs_write(entries: list[dict], path: Path = OUTPUT_PATH) -> bool:
+    """True if path is missing or its bytes differ from to_json(entries)."""
+    return not path.exists() or path.read_bytes() != to_json(entries)
+
+
+def write_json(entries: list[dict], path: Path = OUTPUT_PATH) -> None:
+    path.write_bytes(to_json(entries))
