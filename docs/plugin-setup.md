@@ -16,13 +16,27 @@ is a fine-grained personal access token, which you create once and reuse in ever
 4. **Repository access:** *Only select repositories* → `pearstopher/ffxiv-plugins`. Nothing else.
 5. **Permissions → Repository permissions → Contents:** *Read and write*. (Metadata: read-only
    is added automatically.)
-6. Click **Generate token** and copy it. You only need it for the `gh secret set` step below, so
-   there is no need to save it anywhere else.
+6. Click **Generate token** and copy it, then save it as described below. GitHub never shows it
+   again.
+
+### Where the token is kept
+
+The token is stored locally with Microsoft's PowerShell SecretManagement and SecretStore
+modules, in the default vault `LocalStore`, under the name **`ffxiv-plugins-notify`**. The
+vault is protected by its own password; PowerShell asks for it when needed and keeps the vault
+unlocked for 15 minutes.
+
+| Task | PowerShell command |
+| --- | --- |
+| Save or replace the token (asks for the vault password, then the token) | `Set-Secret -Name ffxiv-plugins-notify` |
+| Check it's there without showing it | `Get-SecretInfo` |
+| Copy it to the clipboard | `Get-Secret ffxiv-plugins-notify -AsPlainText \| Set-Clipboard` |
 
 ### Renewing the token
 
-Every plugin repo with the `dalamud-plugin` topic uses the token. After creating a new one, run
-step 3 of the checklist again for each repo this lists:
+Every plugin repo with the `dalamud-plugin` topic uses the token. After regenerating it on
+GitHub, replace the stored copy with `Set-Secret -Name ffxiv-plugins-notify`, then run step 3
+of the checklist again for each repo this lists:
 
 ```
 gh search repos --owner pearstopher --topic dalamud-plugin
@@ -41,11 +55,13 @@ Replace `<repo>` with the plugin repo's name.
    `AssemblyVersion`, `DalamudApiLevel` and `DownloadLinkInstall`. Its `RepoUrl` or
    `DownloadLinkInstall` must start with `https://github.com/pearstopher/<repo>/`, so that if a
    fetch fails, the previous entry can be kept.
-3. **Secret.** Save the token in the plugin repo. The command asks for the value; paste the
-   token there:
+3. **Secret.** Save the token in the plugin repo, straight from the
+   [stored copy](#where-the-token-is-kept) (PowerShell):
+   ```powershell
+   Get-Secret ffxiv-plugins-notify -AsPlainText | gh secret set PLUGIN_REPO_TOKEN --repo pearstopher/<repo>
    ```
-   gh secret set PLUGIN_REPO_TOKEN --repo pearstopher/<repo>
-   ```
+   Without the stored copy, run `gh secret set PLUGIN_REPO_TOKEN --repo pearstopher/<repo>` and
+   paste the token when it asks.
 4. **Notify step.** Add this to the release workflow **after** the step that pushes `repo.json`,
    so the update reads the new file:
    ```yaml
