@@ -15,5 +15,5 @@ Paste it in game under `/xlsettings` → **Experimental** → **Custom Plugin Re
 <!-- plugins:start -->
 | Plugin | Description | Version |
 | --- | --- | --- |
-| [Remove Duplicate PF](https://github.com/pearstopher/FFXIV-Remove-Duplicate-PF) | Collapses duplicate Party Finder listings into one. | 1.2.2.0 |
+| [Remove PF Duplicates](https://github.com/pearstopher/FFXIV-Remove-PF-Duplicates) | Hide duplicate Party Finder ads. Each repeated listing shows once, with a count. | 1.2.3.0 |
 <!-- plugins:end -->
