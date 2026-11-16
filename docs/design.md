@@ -66,15 +66,25 @@ All other fields are copied through unchanged.
   endings and a trailing newline. Rebuilding unchanged input produces no diff.
 
 ### Updates
-`.github/workflows/update.yml` rebuilds `pluginmaster.json`. There is no schedule (#9 was
-dropped); it runs on two triggers:
+`.github/workflows/update.yml` rebuilds `pluginmaster.json`. It runs on these triggers:
 
 - **Release-triggered:** after a plugin's release workflow commits its new `repo.json`, it sends
   a `repository_dispatch` event (`plugin-updated`) to this repo. This needs one fine-grained PAT
   with Contents read/write on `ffxiv-plugins`, saved as the `PLUGIN_REPO_TOKEN` secret in each
   plugin repo. See `docs/plugin-setup.md` (#16).
+- **Push to `main`:** any change to this repo. The workflow's own commits use `GITHUB_TOKEN`, so
+  they don't trigger it again.
 - **Manual:** `workflow_dispatch` from the Actions tab, e.g. after adding a new plugin or to
   recover from an error.
+- **Weekly:** `schedule`, Mondays 12:00 UTC, with `--min-download-change 100`. It skips writing
+  if the only changes are download counts that each moved by less than 100. When it does write,
+  every count is exact.
+
+### Download counts
+Each entry gets `DownloadCount`, which the in-game installer shows next to the author (#36). It
+is the sum of GitHub's `download_count` for the entry's download file (e.g. `latest.zip`) across
+all of the plugin repo's releases, so it counts installs and updates. If the releases can't be
+fetched, the previous count is kept.
 
 The workflow commits only when the output changed, using `GITHUB_TOKEN` with
 `contents: write`. A `concurrency` group runs one update at a time, so close-together releases

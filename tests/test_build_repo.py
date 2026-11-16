@@ -25,34 +25,53 @@ REPOS = [
 ]
 
 
+def releases(*counts):
+    """One release per count, each with a latest.zip downloaded that many times."""
+    return [{"assets": [{"name": "latest.zip", "download_count": n}]} for n in counts]
+
+
 @pytest.fixture
 def github_api(monkeypatch):
-    """Fake GitHub. Tests change api["repos"] (discovery) and api["files"] (repo.json per repo;
-    an exception value makes that fetch fail)."""
+    """Fake GitHub. Tests change api["repos"] (discovery), api["files"] (repo.json per repo) and
+    api["releases"] (per repo). An exception value makes that fetch fail."""
     api = {
         "repos": REPOS,
         "files": {
             "alpha-plugin": [plugin("Alpha", "1.0.0.0", "alpha-plugin")],
             "beta-plugin": [plugin("Beta", "2.0.0.0", "beta-plugin")],
         },
+        "releases": {"alpha-plugin": releases(10, 5), "beta-plugin": releases(1)},
     }
+
+    def respond(response):
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    def get_all(path):
+        if "/releases" not in path:
+            return api["repos"]
+        return respond(api["releases"].get(path.split("/")[3], []))
 
     def request(url, accept):
         repo = url.split("/repos/me/")[1].split("/")[0]
         response = api["files"].get(repo, HTTPError(url, 404, "Not Found", {}, None))
-        if isinstance(response, Exception):
-            raise response
-        return json.dumps(response).encode(), ""
+        return json.dumps(respond(response)).encode(), ""
 
-    monkeypatch.setattr(github, "get_all", lambda path: api["repos"])
+    monkeypatch.setattr(github, "get_all", get_all)
     monkeypatch.setattr(github, "request", request)
     return api
 
 
 @pytest.fixture
-def run(tmp_path, capsys):
+def output(tmp_path):
+    return tmp_path / "out.json"
+
+
+@pytest.fixture
+def run(tmp_path, output, capsys):
     """Run the CLI against a temp config/output. Returns (printed output, written entry names)."""
-    config, output = tmp_path / "config.json", tmp_path / "out.json"
+    config = tmp_path / "config.json"
     config.write_text(json.dumps({"owner": "me"}), encoding="utf-8")
 
     def run(*extra):
@@ -62,6 +81,10 @@ def run(tmp_path, capsys):
         return capsys.readouterr().out, [e["InternalName"] for e in json.loads(output.read_bytes())]
 
     return run
+
+
+def counts(output):
+    return {e["InternalName"]: e.get("DownloadCount") for e in json.loads(output.read_bytes())}
 
 
 def test_end_to_end(github_api, run):
@@ -107,6 +130,47 @@ def test_from_repo_matches_repo_url_or_download_link():
     entries = [by_link, by_repo_url, similar_name]
 
     assert from_repo(entries, "me", "my-plugin") == [by_link, by_repo_url]
+
+
+def test_download_counts_are_added(github_api, run, output):
+    run()
+    assert counts(output) == {"Alpha": 15, "Beta": 1}
+
+
+def test_failed_releases_fetch_keeps_previous_count(github_api, run, output, caplog):
+    run()
+    github_api["releases"]["alpha-plugin"] = HTTPError("u", 500, "Server Error", {}, None)
+
+    assert run()[0] == "No changes.\n"
+    assert counts(output) == {"Alpha": 15, "Beta": 1}
+    assert "me/alpha-plugin: could not fetch releases" in caplog.text
+
+
+def test_small_count_changes_are_skipped_with_threshold(github_api, run, output):
+    run()
+    github_api["releases"]["alpha-plugin"] = releases(10, 5, 99)
+
+    out, _ = run("--min-download-change", "100")
+    assert "not written" in out
+    assert counts(output) == {"Alpha": 15, "Beta": 1}
+
+
+def test_crossing_threshold_writes_every_exact_count(github_api, run, output):
+    run()
+    github_api["releases"]["alpha-plugin"] = releases(10, 5, 100)
+    github_api["releases"]["beta-plugin"] = releases(1, 2)
+
+    run("--min-download-change", "100")
+    assert counts(output) == {"Alpha": 115, "Beta": 3}
+
+
+def test_other_changes_write_despite_threshold(github_api, run, output):
+    run()
+    github_api["files"]["beta-plugin"] = [plugin("Beta", "2.1.0.0", "beta-plugin")]
+    github_api["releases"]["alpha-plugin"] = releases(10, 5, 1)
+
+    assert "~ Beta 2.0.0.0 -> 2.1.0.0" in run("--min-download-change", "100")[0]
+    assert counts(output) == {"Alpha": 16, "Beta": 1}
 
 
 def test_summarize():
