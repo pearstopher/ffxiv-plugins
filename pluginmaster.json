@@ -24,7 +24,8 @@
     "DownloadLinkInstall": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.0.0/latest.zip",
     "DownloadLinkUpdate": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.0.0/latest.zip",
     "DownloadLinkTesting": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.0.0/latest.zip",
-    "LastUpdate": 1794852440
+    "LastUpdate": 1794852440,
+    "DownloadCount": 4
   },
   {
     "Author": "Ane Mora",
@@ -56,6 +57,7 @@
     "DownloadLinkInstall": "https://github.com/pearstopher/FFXIV-Remove-PF-Duplicates/releases/download/v1.2.3/latest.zip",
     "DownloadLinkUpdate": "https://github.com/pearstopher/FFXIV-Remove-PF-Duplicates/releases/download/v1.2.3/latest.zip",
     "DownloadLinkTesting": "https://github.com/pearstopher/FFXIV-Remove-PF-Duplicates/releases/download/v1.2.3/latest.zip",
-    "LastUpdate": 1794531183
+    "LastUpdate": 1794531183,
+    "DownloadCount": 32
   }
 ]
