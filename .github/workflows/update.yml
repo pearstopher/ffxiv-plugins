@@ -1,10 +1,15 @@
 name: Update plugin list
 
 # Rebuilds pluginmaster.json and the README plugin table, and commits them if they changed. Runs when a plugin repo's
-# release workflow sends a "plugin-updated" event (see docs/plugin-setup.md), or manually.
+# release workflow sends a "plugin-updated" event (see docs/plugin-setup.md), on pushes to main, or manually.
+# The weekly run only commits if something besides download counts changed, or a count moved by 100 or more.
 on:
   repository_dispatch:
     types: [plugin-updated]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 12 * * 1" # Mondays 12:00 UTC
   workflow_dispatch:
 
 permissions:
@@ -28,7 +33,8 @@ jobs:
       - name: Build pluginmaster.json
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python -m scripts.build_repo
+          MIN_DOWNLOAD_CHANGE: ${{ github.event_name == 'schedule' && '100' || '0' }}
+        run: python -m scripts.build_repo --min-download-change "$MIN_DOWNLOAD_CHANGE"
 
       - name: Update README plugin list
         run: python -m scripts.readme

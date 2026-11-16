@@ -10,6 +10,7 @@ from pathlib import Path
 
 from scripts.config import CONFIG_PATH, load_config
 from scripts.discover import discover
+from scripts.downloads import count_downloads, fetch_releases
 from scripts.fetch import fetch_plugins
 from scripts.merge import OUTPUT_PATH, merge, needs_write, read_json, write_json
 
@@ -27,8 +28,19 @@ def from_repo(entries: list[dict], owner: str, repo: str) -> list[dict]:
     return [entry for entry in entries if matches(entry)]
 
 
+def add_download_counts(plugins: list[dict], releases: list[dict] | None, previous: list[dict]):
+    """Set each plugin's DownloadCount from releases, or keep its previous count if releases
+    is None."""
+    old_counts = {e["InternalName"]: e["DownloadCount"] for e in previous if "DownloadCount" in e}
+    for plugin in plugins:
+        if releases is not None:
+            plugin["DownloadCount"] = count_downloads(releases, plugin)
+        elif plugin["InternalName"] in old_counts:
+            plugin["DownloadCount"] = old_counts[plugin["InternalName"]]
+
+
 def build(config_path: Path, previous: list[dict]) -> list[dict]:
-    """Discover, fetch and merge all plugin entries.
+    """Discover, fetch and merge all plugin entries, with download counts.
 
     If a repo's fetch fails, its entries from `previous` are kept. Repos that are no longer
     discovered are dropped.
@@ -40,8 +52,24 @@ def build(config_path: Path, previous: list[dict]) -> list[dict]:
         if plugins is None:
             plugins = from_repo(previous, config.owner, repo)
             log.warning("%s: fetch failed, keeping %d previous entries", repo, len(plugins))
+        else:
+            add_download_counts(plugins, fetch_releases(config.owner, repo), previous)
         entries += plugins
     return merge(entries)
+
+
+def only_small_count_changes(old: list[dict], new: list[dict], threshold: int) -> bool:
+    """True if old and new differ only in DownloadCounts that each moved by less than threshold."""
+
+    def without_counts(entries: list[dict]) -> list[dict]:
+        return [{k: v for k, v in e.items() if k != "DownloadCount"} for e in entries]
+
+    if without_counts(old) != without_counts(new):
+        return False
+    return all(
+        abs(n.get("DownloadCount", 0) - o.get("DownloadCount", 0)) < threshold
+        for o, n in zip(old, new, strict=True)
+    )
 
 
 def summarize(old: list[dict], new: list[dict]) -> list[str]:
@@ -64,6 +92,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--config", type=Path, default=CONFIG_PATH)
     parser.add_argument("--output", type=Path, default=OUTPUT_PATH)
     parser.add_argument("--dry-run", action="store_true", help="show changes without writing")
+    parser.add_argument(
+        "--min-download-change", type=int, default=0, metavar="N",
+        help="skip writing if the only changes are download counts that each moved by less than N",
+    )
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -71,6 +103,9 @@ def main(argv: list[str] | None = None) -> int:
     new = build(args.config, old)
     if not needs_write(new, args.output):
         print("No changes.")
+        return 0
+    if only_small_count_changes(old, new, args.min_download_change):
+        print(f"Only download count changes under {args.min_download_change}; not written.")
         return 0
 
     print("\n".join(summarize(old, new)) or "Plugin details changed.")
