@@ -3,7 +3,7 @@
     "Author": "pearstopher (fork of goat / Franz's Discord Chat Bridge)",
     "Name": "Discord Chat Pears",
     "InternalName": "DiscordChatPears",
-    "AssemblyVersion": "2.3.0.0",
+    "AssemblyVersion": "2.4.0.0",
     "Description": "Two-way bridge between FFXIV chat and Discord. Relays your in-game chat to Discord channels of your choosing, and shows messages from Discord in your chat log. A fork of Discord Chat Bridge.",
     "Punchline": "Two-way chat between FFXIV and Discord.",
     "ApplicableVersion": "any",
@@ -21,11 +21,11 @@
     "CanUnloadAsync": false,
     "LoadPriority": 0,
     "AcceptsFeedback": true,
-    "DownloadLinkInstall": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.3.0/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.3.0/latest.zip",
-    "DownloadLinkTesting": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.3.0/latest.zip",
-    "LastUpdate": 1794869618,
-    "DownloadCount": 7
+    "DownloadLinkInstall": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.4.0/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.4.0/latest.zip",
+    "DownloadLinkTesting": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.4.0/latest.zip",
+    "LastUpdate": 1794871477,
+    "DownloadCount": 9
   },
   {
     "Author": "Ane Mora",
