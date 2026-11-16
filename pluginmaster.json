@@ -1,5 +1,32 @@
 [
   {
+    "Author": "pearstopher (fork of goat / Franz's Discord Chat Bridge)",
+    "Name": "Discord Chat Pears",
+    "InternalName": "DiscordChatPears",
+    "AssemblyVersion": "2.0.0.0",
+    "Description": "Two-way bridge between FFXIV chat and Discord. Relays your in-game chat to Discord channels of your choosing, and shows messages from Discord in your chat log. A fork of Discord Chat Bridge.",
+    "Punchline": "Two-way chat between FFXIV and Discord.",
+    "ApplicableVersion": "any",
+    "RepoUrl": "https://github.com/pearstopher/Dalamud.DiscordBridge",
+    "IconUrl": "https://raw.githubusercontent.com/pearstopher/Dalamud.DiscordBridge/master/Dalamud.DiscordBridge/icon.png",
+    "Tags": [
+      "discord",
+      "chat",
+      "bridge",
+      "relay"
+    ],
+    "DalamudApiLevel": 15,
+    "LoadRequiredState": 0,
+    "LoadSync": false,
+    "CanUnloadAsync": false,
+    "LoadPriority": 0,
+    "AcceptsFeedback": true,
+    "DownloadLinkInstall": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.0.0/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.0.0/latest.zip",
+    "DownloadLinkTesting": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.0.0/latest.zip",
+    "LastUpdate": 1794852440
+  },
+  {
     "Author": "Ane Mora",
     "Name": "Remove PF Duplicates",
     "InternalName": "RemoveDuplicatePF",
