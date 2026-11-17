@@ -62,9 +62,9 @@
   },
   {
     "Author": "Ane Mora",
-    "Name": "Text-Only Mode for FFXIV",
+    "Name": "Text-Only Mode",
     "InternalName": "TextBasedRPG",
-    "AssemblyVersion": "1.0.2.0",
+    "AssemblyVersion": "1.0.3.0",
     "Description": "Turns FFXIV into a text-based RPG. Type /trpg and the 3D world and the whole HUD disappear: only the chat window stays, and the frame rate drops, so the game barely uses your CPU while you're just chatting with friends.\n\nYour connection stays alive, you can keep talking in every chat channel, and sound keeps playing. Type /trpg again to go back to playing.",
     "Punchline": "Turn off the graphics, keep the chat. A low-CPU chat-only mode.",
     "ApplicableVersion": "any",
@@ -86,10 +86,10 @@
     "CanUnloadAsync": false,
     "LoadPriority": 0,
     "AcceptsFeedback": true,
-    "DownloadLinkInstall": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.2/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.2/latest.zip",
-    "DownloadLinkTesting": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.2/latest.zip",
-    "LastUpdate": 1794935743,
-    "DownloadCount": 0
+    "DownloadLinkInstall": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.3/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.3/latest.zip",
+    "DownloadLinkTesting": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.3/latest.zip",
+    "LastUpdate": 1794936608,
+    "DownloadCount": 3
   }
 ]
