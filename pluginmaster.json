@@ -25,7 +25,7 @@
     "DownloadLinkUpdate": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.4.0/latest.zip",
     "DownloadLinkTesting": "https://github.com/pearstopher/Dalamud.DiscordBridge/releases/download/v2.4.0/latest.zip",
     "LastUpdate": 1794871477,
-    "DownloadCount": 9
+    "DownloadCount": 11
   },
   {
     "Author": "Ane Mora",
@@ -59,5 +59,37 @@
     "DownloadLinkTesting": "https://github.com/pearstopher/FFXIV-Remove-PF-Duplicates/releases/download/v1.2.3/latest.zip",
     "LastUpdate": 1794531183,
     "DownloadCount": 32
+  },
+  {
+    "Author": "Ane Mora",
+    "Name": "Text-Only Mode for FFXIV",
+    "InternalName": "TextBasedRPG",
+    "AssemblyVersion": "1.0.0.0",
+    "Description": "Turns FFXIV into a text-based RPG. Type /trpg and the 3D world and the whole HUD disappear: only the chat window stays, and the frame rate drops, so the game barely uses your CPU while you're just chatting with friends.\n\nYour connection stays alive, you can keep talking in every chat channel, and sound keeps playing. Type /trpg again to go back to playing.",
+    "Punchline": "Turn off the graphics, keep the chat. A low-CPU chat-only mode.",
+    "ApplicableVersion": "any",
+    "RepoUrl": "https://github.com/pearstopher/ffxiv-text-based-rpg",
+    "IconUrl": "https://raw.githubusercontent.com/pearstopher/ffxiv-text-based-rpg/master/images/icon.png",
+    "Tags": [
+      "chat",
+      "performance",
+      "cpu",
+      "fps",
+      "render",
+      "low power",
+      "afk",
+      "idle"
+    ],
+    "DalamudApiLevel": 15,
+    "LoadRequiredState": 0,
+    "LoadSync": false,
+    "CanUnloadAsync": false,
+    "LoadPriority": 0,
+    "AcceptsFeedback": true,
+    "DownloadLinkInstall": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.0/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.0/latest.zip",
+    "DownloadLinkTesting": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.0/latest.zip",
+    "LastUpdate": 1794933840,
+    "DownloadCount": 0
   }
 ]
