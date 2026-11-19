@@ -64,7 +64,7 @@
     "Author": "Ane Mora",
     "Name": "Text-Only Mode",
     "InternalName": "TextBasedRPG",
-    "AssemblyVersion": "1.0.4.0",
+    "AssemblyVersion": "1.0.5.0",
     "Description": "Turns FFXIV into a text-based RPG. Type /trpg and your view of Eorzea disappears until you type /trpg again. Choose between showing the full game UI or the chatbox only.",
     "Punchline": "Temporarily disable all 3D rendering. An extremely low-CPU mode for FFXIV.",
     "ApplicableVersion": "any",
@@ -86,10 +86,10 @@
     "CanUnloadAsync": false,
     "LoadPriority": 0,
     "AcceptsFeedback": true,
-    "DownloadLinkInstall": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.4/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.4/latest.zip",
-    "DownloadLinkTesting": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.4/latest.zip",
-    "LastUpdate": 1795059289,
-    "DownloadCount": 7
+    "DownloadLinkInstall": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.5/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.5/latest.zip",
+    "DownloadLinkTesting": "https://github.com/pearstopher/ffxiv-text-based-rpg/releases/download/v1.0.5/latest.zip",
+    "LastUpdate": 1795060395,
+    "DownloadCount": 9
   }
 ]

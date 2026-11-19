@@ -17,5 +17,5 @@ Paste it in game under `/xlsettings` → **Experimental** → **Custom Plugin Re
 | --- | --- | --- |
 | [Discord Chat Pears](https://github.com/pearstopher/Dalamud.DiscordBridge) | Two-way chat between FFXIV and Discord. | 2.4.2.0 |
 | [Remove PF Duplicates](https://github.com/pearstopher/FFXIV-Remove-PF-Duplicates) | Hide duplicate Party Finder ads. Each repeated listing shows once, with a count. | 1.2.3.0 |
-| [Text-Only Mode](https://github.com/pearstopher/ffxiv-text-based-rpg) | Temporarily disable all 3D rendering. An extremely low-CPU mode for FFXIV. | 1.0.4.0 |
+| [Text-Only Mode](https://github.com/pearstopher/ffxiv-text-based-rpg) | Temporarily disable all 3D rendering. An extremely low-CPU mode for FFXIV. | 1.0.5.0 |
 <!-- plugins:end -->
